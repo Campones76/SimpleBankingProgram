@@ -1,4 +1,5 @@
 package io.github.campones76;
+import io.github.campones76.backend.dbstuff.CreateDB;
 import io.github.campones76.banking.Account;
 import io.github.campones76.utility.print;
 import org.apache.commons.csv.CSVFormat;
@@ -15,6 +16,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        CreateDB.createDatabaseAndTableIfNotExists();
         //System.out.println("Hello world!");
         Scanner scanner = new Scanner(System.in);
 
@@ -23,7 +25,9 @@ public class Main {
         String username = scanner.nextLine();
         print.ln("Enter password: ");
         String passwd = scanner.nextLine();
-        Account account = new Account(username, passwd, BigDecimal.ZERO);
+        //Account account = new Account(username, passwd, BigDecimal.ZERO);
+        Account account = new Account();
+        account.createAccount(username, passwd, BigDecimal.ZERO);
 
         //Deposit cash
         print.ln("Enter amount to deposit: ");
@@ -33,7 +37,7 @@ public class Main {
         //check balance
         print.ln("Current balance: " + account.CheckBalance());
 
-        //write to CSV
+        /*//write to CSV
         try {
             String filename = "src/main/output/accounts/Accounts.csv";
             boolean fileIsEmpty = !new File(filename).exists() || Files.readAllLines(Paths.get(filename)).isEmpty();
@@ -48,6 +52,8 @@ public class Main {
             }
         } catch (IOException e) {
            e.printStackTrace();
-        }
+        }*/
+        // Save to SQLite database
+        CreateDB.saveToDatabase(username, account.hashedPassword, account.CheckBalance());
     }
 }
