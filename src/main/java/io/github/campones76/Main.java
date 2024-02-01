@@ -4,9 +4,12 @@ import io.github.campones76.utility.print;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 
@@ -32,11 +35,14 @@ public class Main {
 
         //write to CSV
         try {
-            FileWriter out = new FileWriter("src/main/output/accounts/Accounts.csv", true);
-            CSVFormat format = CSVFormat.DEFAULT
-                    .builder()
-                    .setHeader("Username", "Password", "Balance")
-                    .build();
+            String filename = "src/main/output/accounts/Accounts.csv";
+            boolean fileIsEmpty = !new File(filename).exists() || Files.readAllLines(Paths.get(filename)).isEmpty();
+            FileWriter out = new FileWriter(filename, true);
+            CSVFormat.Builder builder = CSVFormat.DEFAULT.builder();
+            if (fileIsEmpty){
+                builder.setHeader("Username", "Password", "Balance");
+            }
+            CSVFormat format = builder.build();
             try (CSVPrinter printer = new CSVPrinter(out, format)){
                 printer.printRecord(username, passwd, account.CheckBalance());
             }
