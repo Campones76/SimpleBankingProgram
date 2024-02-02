@@ -13,11 +13,6 @@ public class Account {
     // Constructor
     public Account() {
     }
-    public Account(String username, String passwd, BigDecimal balance) {
-        this.username = username;
-        this.hashedPassword = hashPassword(passwd);  // Hash the password during account creation
-        this.balance = balance;
-    }
 
     public void createAccount(String username, String passwd, BigDecimal initialBalance) {
         // Hash the password before storing it
