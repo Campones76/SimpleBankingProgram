@@ -37,8 +37,8 @@ public class CreateDB {
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                     + "username TEXT NOT NULL,\n"
                     + "password TEXT NOT NULL,\n"
-                    + "balance REAL/*,*/\n"
-                    /*+ "iban TEXT NOT NULL\n"*/
+                    + "balance REAL,\n"
+                    + "iban TEXT NOT NULL\n"
                     + ");";
 
             // Execute the SQL command
@@ -50,15 +50,16 @@ public class CreateDB {
             System.err.println("Error: " + e.getMessage());
         }
     }
-    public static void saveToDatabase(String username, String password, BigDecimal balance/*, String iban*/) {
+    public static void saveToDatabase(String username, String password, BigDecimal balance, String iban) {
         String url = "jdbc:sqlite:BankOfCanedo.db";
 
         try (Connection connection = DriverManager.getConnection(url);
-             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO accounts(username, password, balance/*, iban*/) VALUES (?, ?, ?/*, ?*/)")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO accounts(username, password, balance, iban/*, iban*/) VALUES (?, ?, ?, ?/*, ?*/)")) {
 
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, password);
             preparedStatement.setBigDecimal(3, balance);
+            preparedStatement.setString(4, iban);
             //preparedStatement.setString(4, iban);
 
             int rowsAffected = preparedStatement.executeUpdate();

@@ -2,6 +2,7 @@ package io.github.campones76.backend.dbstuff;
 
 import io.github.campones76.banking.Account;
 import io.github.campones76.backend.dbstuff.ConnectionDB;
+import io.github.campones76.utility.print;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.math.BigDecimal;
@@ -9,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class OperationsDB {
     public static Account getAccountFromDB(String username){
@@ -33,14 +35,31 @@ public class OperationsDB {
 
     public static boolean verifyPassword(String username, String inputPassword) {
         String url = ConnectionDB.url;
+        int maxAttempts = 3;
+        int attempts = 0;
+
         try(java.sql.Connection connection2 = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection2.prepareStatement("Select password FROM accounts WHERE username = ?")){
             preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
+             Scanner scanner = new Scanner(System.in);
+
             if (resultSet.next()) {
                 String passwd = resultSet.getString("password");
-                return BCrypt.checkpw(inputPassword, passwd); // Check the input password against the hashed password from the database
+                while (attempts < maxAttempts - 1){
+                    // Check the input password against the hashed password from the database
+                    if (BCrypt.checkpw(inputPassword, passwd)){
+                     return  true;
+                    } else {
+                        attempts++;
+                        print.ln("Incorrect password. Attempts left: " + (maxAttempts - attempts));
+
+                        // Prompt the user for password again
+                        print.ln("Password: ");
+                        inputPassword = scanner.nextLine();
+                    }
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

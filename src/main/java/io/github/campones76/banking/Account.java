@@ -13,6 +13,10 @@ public class Account {
     public String username;
     public String hashedPassword;  // Updated field for hashed password
     public BigDecimal balance;
+    private String iban;
+    public String getIban() {
+        return iban;
+    }
 
     //public String liban;
 
@@ -27,6 +31,7 @@ public class Account {
         this.username = username;
         this.hashedPassword = hashedPassword;
         this.balance = initialBalance;
+        this.iban = generatePortugueseIban();
         //liban = generatePortugueseIban();
         //this.iban = generatePortugueseIban();
     }
@@ -54,10 +59,18 @@ public class Account {
     }
 
     private String generatePortugueseIban() {
+        // PTkk BBBB CCCC CCCC CCCC CCCK KK
+        // Where 'k' is the check digit, 'B' is the bank identifier, and 'C' is the account number
         Faker faker = new Faker(new Locale("pt-PT"));
-        FakeValuesService fakeValuesService = new FakeValuesService(
-                new Locale("pt-PT"), new RandomService());
+        String bankIdentifier = String.format("%04d", faker.number().numberBetween(1, 10000)); // Replace with the actual bank identifier
 
-        return fakeValuesService.resolve("iban", null, faker);
+        StringBuilder accountNumber = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            accountNumber.append(faker.number().digit());
+        }
+
+        String checkDigit = faker.number().digit();
+
+        return "PT" + checkDigit + bankIdentifier + accountNumber + checkDigit;
     }
 }

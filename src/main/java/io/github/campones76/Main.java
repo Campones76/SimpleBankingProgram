@@ -59,7 +59,8 @@ public class Main {
            e.printStackTrace();
         }*/
             // Save to SQLite database
-            CreateDB.saveToDatabase(username, account.hashedPassword, account.CheckBalance()/*, account.iban*/);
+            String iban = account.getIban();
+            CreateDB.saveToDatabase(username, account.hashedPassword, account.CheckBalance(), iban)/*, account.iban*/;
         } else if (choiceStart == 2){
             print.ln("Username: ");
             String username = scanner.nextLine();
@@ -74,15 +75,19 @@ public class Main {
                     print.ln("Welcome back, " + username);
                     print.ln("Current Balance: " + account.CheckBalance() + "€");
                     print.ln("\n");
-                    print.ln("1. Deposit");
-                    print.ln("2. Withdraw");
-                    print.ln("3. Logout");
+                    print.ln("1. Check IBAN");
+                    print.ln("2. Deposit");
+                    print.ln("3. Withdraw");
+                    print.ln("4. Logout");
                     print.ln("Enter choice: ");
 
                     int ChoiceLogged = scanner.nextInt();
                     scanner.nextLine(); //skips to the next line
                     switch (ChoiceLogged){
                         case 1:
+                            print.ln("Your IBAN is: " + account.getIban());
+                            break;
+                        case 2:
                             print.ln("Enter amount to deposit: ");
                             BigDecimal DepositAmount = scanner.nextBigDecimal();
                             account.deposit(DepositAmount);
@@ -90,7 +95,7 @@ public class Main {
 
                             OperationsDB.updateBalanceInDatabase(username, account.CheckBalance());
                             break;
-                        case 2:
+                        case 3:
                             print.ln("Enter amount to withdraw: ");
                             BigDecimal withdrawamount = scanner.nextBigDecimal();
                             account.withdraw(withdrawamount);
@@ -98,7 +103,7 @@ public class Main {
                             OperationsDB.updateBalanceInDatabase(username, account.CheckBalance());
                             break;
 
-                        case 3:
+                        case 4:
                             print.ln("Logged Out!");
                             loggedIn = false;
                             break;
