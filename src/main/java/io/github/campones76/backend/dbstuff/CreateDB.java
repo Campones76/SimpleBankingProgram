@@ -132,4 +132,16 @@ public class CreateDB {
             System.err.println("Error: " + e.getMessage());
         }
     }
+    public static void closeResources(Connection connection, Statement statement) {
+        try {
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

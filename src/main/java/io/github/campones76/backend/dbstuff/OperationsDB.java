@@ -6,10 +6,7 @@ import io.github.campones76.utility.print;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.math.BigDecimal;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Scanner;
 
 public class OperationsDB {
@@ -38,8 +35,8 @@ public class OperationsDB {
         int maxAttempts = 3;
         int attempts = 0;
 
-        try(java.sql.Connection connection2 = DriverManager.getConnection(url);
-            PreparedStatement preparedStatement = connection2.prepareStatement("Select password FROM accounts WHERE username = ?")){
+        try(java.sql.Connection connection = DriverManager.getConnection(url);
+            PreparedStatement preparedStatement = connection.prepareStatement("Select password FROM accounts WHERE username = ?")){
             preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -70,8 +67,8 @@ public class OperationsDB {
     public static void updateBalanceInDatabase(String username, BigDecimal newBalance) {
         String url = ConnectionDB.url;
         String updateQuery = "UPDATE accounts SET balance = ? WHERE username = ?";
-        try(java.sql.Connection connection3 = DriverManager.getConnection(url);
-            PreparedStatement preparedStatement = connection3.prepareStatement(updateQuery)) {
+        try(java.sql.Connection connection = DriverManager.getConnection(url);
+            PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
             preparedStatement.setBigDecimal(1, newBalance);
             preparedStatement.setString(2, username);
 
@@ -86,4 +83,20 @@ public class OperationsDB {
             e.printStackTrace();  // Handle the exception according to your application's needs.
         }
     }
+    public static void closeResources(Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
+        try {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
