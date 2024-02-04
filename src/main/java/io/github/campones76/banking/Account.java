@@ -1,14 +1,20 @@
 package io.github.campones76.banking;
 
+import com.github.javafaker.Faker;
+import com.github.javafaker.service.FakeValuesService;
+import com.github.javafaker.service.RandomService;
 import io.github.campones76.utility.print;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 public class Account {
     public String username;
     public String hashedPassword;  // Updated field for hashed password
     public BigDecimal balance;
+
+    //public String liban;
 
     // Constructor
     public Account() {
@@ -21,6 +27,8 @@ public class Account {
         this.username = username;
         this.hashedPassword = hashedPassword;
         this.balance = initialBalance;
+        //liban = generatePortugueseIban();
+        //this.iban = generatePortugueseIban();
     }
 
     // Methods
@@ -45,8 +53,11 @@ public class Account {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    public boolean verifyPassword(String inputPassword) {
-        // Check if the input password matches the stored hashed password
-        return BCrypt.checkpw(inputPassword, hashedPassword);
+    private String generatePortugueseIban() {
+        Faker faker = new Faker(new Locale("pt-PT"));
+        FakeValuesService fakeValuesService = new FakeValuesService(
+                new Locale("pt-PT"), new RandomService());
+
+        return fakeValuesService.resolve("iban", null, faker);
     }
 }
