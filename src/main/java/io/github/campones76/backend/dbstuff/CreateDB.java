@@ -14,6 +14,7 @@ public class CreateDB {
     public static void createDatabaseAndTableIfNotExists() {
         createDatabase();
         createTable();
+        createHashedIbansTable();
     }
 
     private static void createDatabase() {
@@ -50,6 +51,64 @@ public class CreateDB {
             System.err.println("Error: " + e.getMessage());
         }
     }
+
+
+    private static void createHashedIbansTable() {
+        String url = "jdbc:sqlite:BankOfCanedo.db";
+        try (Connection connection = DriverManager.getConnection(url);
+             Statement statement = connection.createStatement()) {
+
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS hashed_ibans (\n"
+                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+                    + "hashed_iban TEXT NOT NULL\n"
+                    + ");";
+
+            statement.execute(createTableSQL);
+            System.out.println("Hashed IBANs table successfully created (if not already existing).");
+
+        } catch (SQLException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+
+    public static void saveHashedIbanToDatabase(String hashedIban) {
+        String url = "jdbc:sqlite:BankOfCanedo.db";
+        String insertQuery = "INSERT INTO hashed_ibans(hashed_iban) VALUES (?)";
+        try (Connection connection = DriverManager.getConnection(url);
+             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+
+            preparedStatement.setString(1, hashedIban);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Hashed IBAN successfully saved to the database.");
+            } else {
+                System.out.println("Failed to save hashed IBAN to the database.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+
+    public static boolean isIbanHashDuplicate(String hashedIban) {
+        String url = "jdbc:sqlite:BankOfCanedo.db";
+        String selectQuery = "SELECT hashed_iban FROM hashed_ibans WHERE hashed_iban = ?";
+        try (Connection connection = DriverManager.getConnection(url);
+             PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
+
+            preparedStatement.setString(1, hashedIban);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next();
+
+        } catch (SQLException e) {
+            System.err.println("Error: " + e.getMessage());
+            return false;
+        }
+    }
+
+
     public static void saveToDatabase(String username, String password, BigDecimal balance, String iban) {
         String url = "jdbc:sqlite:BankOfCanedo.db";
 
