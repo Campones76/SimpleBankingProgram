@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class Account {
     public String username;
-    public String hashedPassword;  // Updated field for hashed password
+    public String hashedPassword;
     public BigDecimal balance;
     private String iban;
 
@@ -97,7 +97,7 @@ public class Account {
         // Where 'k' is the check digit, 'B' is the bank identifier, and 'C' is the account number
         Faker faker = new Faker(new Locale("pt-PT"));
         String bankIdentifier = faker.bool().bool() ? "1212" : String.format("%04d", faker.number().numberBetween(1, 10000));
-        //String bankIdentifier = String.format("%04d", faker.number().numberBetween(1, 10000)); // Replace with the actual bank identifier
+        //String bankIdentifier = String.format("%04d", faker.number().numberBetween(1, 10000));
 
         StringBuilder accountNumber = new StringBuilder();
         for (int i = 0; i < 10; i++) {
