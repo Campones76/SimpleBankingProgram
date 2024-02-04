@@ -1,13 +1,15 @@
 TO DO
-
-Login system
+Registration system (done)
+Login system (done)
 
 a user screen where it's possible to
 
-  deposit
+  deposit(done)
 
-  withdraw
+  withdraw (done)
 
-  logout (maybe)
+  logout (maybe) (done)
 
-  send money to other accounts (maybe)
+  send money to other accounts
+
+  Make Ibans unique
