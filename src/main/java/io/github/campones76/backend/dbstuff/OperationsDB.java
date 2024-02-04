@@ -80,7 +80,7 @@ public class OperationsDB {
                 System.out.println("Failed to update balance in the database for user: " + username);
             }
         } catch (SQLException e) {
-            e.printStackTrace();  // Handle the exception according to your application's needs.
+            e.printStackTrace();  
         }
     }
     public static void closeResources(Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
