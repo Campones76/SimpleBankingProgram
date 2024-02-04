@@ -1,15 +1,25 @@
-TO DO
-Registration system (done)
-Login system (done)
+# TODO
 
-a user screen where it's possible to
+## Section
 
-  deposit(done)
+And this text neither.
 
-  withdraw (done)
+- [X] Generate Ibans
+  - [ ] Make ibans unique
+- [ ] Send money to other accounts
 
-  logout (maybe) (done)
+# BACKLOG
 
-  send money to other accounts
+- [ ] This task is postponed
 
-  Make Ibans unique
+# DONE
+
+- [x] This task is done #prio1 Login system
+- [x] Login system
+- [x] registration system
+- [x] withdraw functionality
+- [x] deposit functionality
+- [x] logout functionality
+- [x] password attempts functionality
+- [x] Iban generation
+- [-] This task has been declined
