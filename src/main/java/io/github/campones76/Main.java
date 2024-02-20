@@ -72,7 +72,8 @@ public class Main {
                     print.ln("1. Check IBAN");
                     print.ln("2. Deposit");
                     print.ln("3. Withdraw");
-                    print.ln("4. Logout");
+                    print.ln("4. Send money");
+                    print.ln("5. Logout");
                     print.ln("Enter choice: ");
 
                     int ChoiceLogged = scanner.nextInt();
@@ -108,6 +109,21 @@ public class Main {
                             OperationsDB.updateBalanceInDatabase(username, account.CheckBalance());
                             break;
                         case 4:
+                            print.ln("Enter destination's IBAN: ");
+                            String destIban = scanner.nextLine();
+                            if (OperationsDB.doesIbanExist(destIban)) {
+                                print.ln("Enter amount to send: ");
+                                BigDecimal amounttosend = scanner.nextBigDecimal();
+                                //OperationsDB.updateBalanceInDatabaseIBAN(destIban, amounttosend);
+                                account.amounttosend(amounttosend,destIban);
+                                account.withdraw(amounttosend);
+                                OperationsDB.updateBalanceInDatabase(username, account.CheckBalance());
+                            } else{
+                                print.ln("Iban doesn't exist");
+                        }
+
+                            break;
+                        case 5:
                             print.ln("Logged Out!");
                             loggedIn = false;
                             break;

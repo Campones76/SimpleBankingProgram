@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class OperationsDB {
-    public static Account getAccountFromDB(String username){
+    public static Account getAccountFromDB(String username) {
         String SERVER_NAME = "192.168.1.70";
         String DATABASE_NAME = "BankOfCanedo";
         String UID = "boc";
@@ -19,8 +19,8 @@ public class OperationsDB {
         String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
                 SERVER_NAME, DATABASE_NAME, UID, PWD);
 
-        try(Connection connection = DriverManager.getConnection(connectionString);
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM accounts WHERE username = ?")){
+        try (Connection connection = DriverManager.getConnection(connectionString);
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM accounts WHERE username = ?")) {
             preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -36,6 +36,31 @@ public class OperationsDB {
         }
         return null;
     }
+
+    public static boolean doesIbanExist(String destIban) {
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+        try (Connection connection = DriverManager.getConnection(connectionString);
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT iban FROM accounts WHERE iban = ?")) {
+            preparedStatement.setString(1, destIban);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public static boolean verifyPassword(String username, String inputPassword) {
         String SERVER_NAME = "192.168.1.70";
@@ -104,6 +129,44 @@ public class OperationsDB {
             e.printStackTrace();
         }
     }
+
+    public static void updateBalanceInDatabaseIBAN(String destIban, BigDecimal newBalance) {
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
+        String updateQuery = "UPDATE accounts SET balance = balance + ? WHERE iban = ?";
+        try (Connection connection = DriverManager.getConnection(connectionString);
+             PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+            preparedStatement.setBigDecimal(1, newBalance);
+            preparedStatement.setString(2, destIban);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                // Fetch the username associated with the given IBAN
+                String findusernameQuery = "SELECT username FROM accounts WHERE iban = ?";
+                try (PreparedStatement usernameStatement = connection.prepareStatement(findusernameQuery)) {
+                    usernameStatement.setString(1, destIban);
+                    ResultSet resultSet = usernameStatement.executeQuery();
+                    if (resultSet.next()) {
+                        String username = resultSet.getString("username");
+                        System.out.println("Balance updated in the database for user " + username + " with IBAN: " + destIban);
+                    } else {
+                        System.out.println("No user found for the given IBAN: " + destIban);
+                    }
+                }
+            } else {
+                System.out.println("Failed to update balance in the database for IBAN: " + destIban);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void closeResources(Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
         try {
             if (resultSet != null) {

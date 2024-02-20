@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
 import io.github.campones76.backend.dbstuff.CreateDB;
+import io.github.campones76.backend.dbstuff.OperationsDB;
 import io.github.campones76.utility.print;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -50,6 +51,16 @@ public class Account {
         this.iban = iban;
     }
     public void deposit(BigDecimal amount) {
+        balance = balance.add(amount);
+    }
+
+    public void amounttosend(BigDecimal amount, String destIban) {
+        if (balance.compareTo(amount) >= 0) {
+            balance = balance.subtract(amount);
+            OperationsDB.updateBalanceInDatabaseIBAN(destIban, amount);
+        } else {
+            print.ln("Insufficient balance!");
+        }
         balance = balance.add(amount);
     }
 
