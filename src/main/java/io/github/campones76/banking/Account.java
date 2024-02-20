@@ -87,6 +87,9 @@ public class Account {
 
         return iban;
     }
+    public String getHashedPassword() {
+        return hashedPassword;
+    }
 
     private boolean isIbanHashDuplicate(String hashedIban) {
         return CreateDB.isIbanHashDuplicate(hashedIban);

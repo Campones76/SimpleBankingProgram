@@ -11,9 +11,16 @@ import java.util.Scanner;
 
 public class OperationsDB {
     public static Account getAccountFromDB(String username){
-        String url = ConnectionDB.url;
-        try(java.sql.Connection connection = DriverManager.getConnection(url);
-            PreparedStatement preparedStatement = connection.prepareStatement("Select * FROM accounts WHERE username = ?")){
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
+        try(Connection connection = DriverManager.getConnection(connectionString);
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM accounts WHERE username = ?")){
             preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -31,23 +38,30 @@ public class OperationsDB {
     }
 
     public static boolean verifyPassword(String username, String inputPassword) {
-        String url = ConnectionDB.url;
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
         int maxAttempts = 3;
         int attempts = 0;
 
-        try(java.sql.Connection connection = DriverManager.getConnection(url);
-            PreparedStatement preparedStatement = connection.prepareStatement("Select password FROM accounts WHERE username = ?")){
+        try(Connection connection = DriverManager.getConnection(connectionString);
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT password FROM accounts WHERE username = ?")){
             preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-             Scanner scanner = new Scanner(System.in);
+            Scanner scanner = new Scanner(System.in);
 
             if (resultSet.next()) {
                 String passwd = resultSet.getString("password");
                 while (attempts < maxAttempts - 1){
                     // Check the input password against the hashed password from the database
                     if (BCrypt.checkpw(inputPassword, passwd)){
-                     return  true;
+                        return true;
                     } else {
                         attempts++;
                         print.ln("Incorrect password. Attempts left: " + (maxAttempts - attempts));
@@ -65,9 +79,16 @@ public class OperationsDB {
     }
 
     public static void updateBalanceInDatabase(String username, BigDecimal newBalance) {
-        String url = ConnectionDB.url;
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
         String updateQuery = "UPDATE accounts SET balance = ? WHERE username = ?";
-        try(java.sql.Connection connection = DriverManager.getConnection(url);
+        try(Connection connection = DriverManager.getConnection(connectionString);
             PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
             preparedStatement.setBigDecimal(1, newBalance);
             preparedStatement.setString(2, username);
@@ -80,7 +101,7 @@ public class OperationsDB {
                 System.out.println("Failed to update balance in the database for user: " + username);
             }
         } catch (SQLException e) {
-            e.printStackTrace();  
+            e.printStackTrace();
         }
     }
     public static void closeResources(Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
@@ -99,4 +120,3 @@ public class OperationsDB {
         }
     }
 }
-

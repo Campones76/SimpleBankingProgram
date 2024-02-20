@@ -18,34 +18,31 @@ public class CreateDB {
     }
 
     private static void createDatabase() {
-        String url = "jdbc:sqlite:BankOfCanedo.db";
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
 
-        try (Connection connection = DriverManager.getConnection(url)) {
-            print.ln("Database connection successful.");
-        } catch (SQLException e) {
-            System.err.println("Error: " + e.getMessage());
-        }
-    }
+        String connectionString = String.format("jdbc:sqlserver://%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, UID, PWD);
 
-    private static void createTable() {
-        String url = "jdbc:sqlite:BankOfCanedo.db";
-
-        try (Connection connection = DriverManager.getConnection(url);
+        try (Connection connection = DriverManager.getConnection(connectionString);
              Statement statement = connection.createStatement()) {
 
-            // SQL command to create a table
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS accounts (\n"
-                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
-                    + "username TEXT NOT NULL,\n"
-                    + "password TEXT NOT NULL,\n"
-                    + "balance REAL,\n"
-                    + "iban TEXT NOT NULL\n"
-                    + ");";
+            // Check if the database already exists
+            String checkDatabaseExistsSQL = "SELECT COUNT(*) AS db_count FROM sys.databases WHERE name = '" + DATABASE_NAME + "'";
+            ResultSet resultSet = statement.executeQuery(checkDatabaseExistsSQL);
+            resultSet.next();
+            int dbCount = resultSet.getInt("db_count");
 
-            // Execute the SQL command
-            statement.execute(createTableSQL);
-
-            print.ln("Table successfully created (if not already existing).");
+            if (dbCount == 0) {
+                // Database doesn't exist, so create it
+                String createDatabaseSQL = "CREATE DATABASE " + DATABASE_NAME;
+                statement.execute(createDatabaseSQL);
+                print.ln("New database created: " + DATABASE_NAME);
+            } else {
+                print.ln("Using existing database: " + DATABASE_NAME);
+            }
 
         } catch (SQLException e) {
             System.err.println("Error: " + e.getMessage());
@@ -53,15 +50,62 @@ public class CreateDB {
     }
 
 
-    private static void createHashedIbansTable() {
-        String url = "jdbc:sqlite:BankOfCanedo.db";
-        try (Connection connection = DriverManager.getConnection(url);
+    private static void createTable() {
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
+        try (Connection connection = DriverManager.getConnection(connectionString);
+             Statement statement = connection.createStatement()) {
+
+            // Check if the table already exists
+            String checkTableExistsSQL = "SELECT COUNT(*) AS table_count FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'accounts'";
+            ResultSet resultSet = statement.executeQuery(checkTableExistsSQL);
+            resultSet.next();
+            int tableCount = resultSet.getInt("table_count");
+
+            if (tableCount == 0) {
+                // Table doesn't exist, so create it
+                String createTableSQL = "CREATE TABLE accounts (\n"
+                        + "id INT PRIMARY KEY IDENTITY(1,1),\n"  // Using IDENTITY for auto-increment in SQL Server
+                        + "username NVARCHAR(255) NOT NULL,\n"  // NVARCHAR for variable-length Unicode strings
+                        + "password NVARCHAR(255) NOT NULL,\n"
+                        + "balance DECIMAL(10, 2),\n"  // DECIMAL for exact numeric data types
+                        + "iban NVARCHAR(50) NOT NULL\n"
+                        + ")";
+                statement.execute(createTableSQL);
+                System.out.println("Table successfully created.");
+            } else {
+                System.out.println("Table 'accounts' already exists.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+
+
+
+    /*private static void createHashedIbansTable() {
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
+        try (Connection connection = DriverManager.getConnection(connectionString);
              Statement statement = connection.createStatement()) {
 
             String createTableSQL = "CREATE TABLE IF NOT EXISTS hashed_ibans (\n"
-                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
-                    + "hashed_iban TEXT NOT NULL\n"
-                    + ");";
+                    + "id INT PRIMARY KEY IDENTITY(1,1),\n"
+                    + "hashed_iban NVARCHAR(255) NOT NULL\n"
+                    + ")";
 
             statement.execute(createTableSQL);
             System.out.println("Hashed IBANs table successfully created (if not already existing).");
@@ -69,12 +113,54 @@ public class CreateDB {
         } catch (SQLException e) {
             System.err.println("Error: " + e.getMessage());
         }
+    }*/
+
+    private static void createHashedIbansTable() {
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
+        try (Connection connection = DriverManager.getConnection(connectionString);
+             Statement statement = connection.createStatement()) {
+
+            // Check if the table already exists
+            String checkTableExistsSQL = "SELECT COUNT(*) AS table_count FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'hashed_ibans'";
+            ResultSet resultSet = statement.executeQuery(checkTableExistsSQL);
+            resultSet.next();
+            int tableCount = resultSet.getInt("table_count");
+
+            if (tableCount == 0) {
+                // Table doesn't exist, so create it
+                String createTableSQL = "CREATE TABLE hashed_ibans (\n"
+                        + "id INT PRIMARY KEY IDENTITY(1,1),\n"
+                        + "hashed_iban NVARCHAR(255) NOT NULL\n"
+                        + ")";
+                statement.execute(createTableSQL);
+                System.out.println("Hashed IBANs table successfully created.");
+            } else {
+                System.out.println("Hashed IBANs table already exists.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
     }
 
     public static void saveHashedIbanToDatabase(String hashedIban) {
-        String url = "jdbc:sqlite:BankOfCanedo.db";
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
         String insertQuery = "INSERT INTO hashed_ibans(hashed_iban) VALUES (?)";
-        try (Connection connection = DriverManager.getConnection(url);
+        try (Connection connection = DriverManager.getConnection(connectionString);
              PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
 
             preparedStatement.setString(1, hashedIban);
@@ -92,9 +178,16 @@ public class CreateDB {
     }
 
     public static boolean isIbanHashDuplicate(String hashedIban) {
-        String url = "jdbc:sqlite:BankOfCanedo.db";
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
         String selectQuery = "SELECT hashed_iban FROM hashed_ibans WHERE hashed_iban = ?";
-        try (Connection connection = DriverManager.getConnection(url);
+        try (Connection connection = DriverManager.getConnection(connectionString);
              PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setString(1, hashedIban);
@@ -108,18 +201,22 @@ public class CreateDB {
         }
     }
 
-
     public static void saveToDatabase(String username, String password, BigDecimal balance, String iban) {
-        String url = "jdbc:sqlite:BankOfCanedo.db";
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
 
-        try (Connection connection = DriverManager.getConnection(url);
-             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO accounts(username, password, balance, iban/*, iban*/) VALUES (?, ?, ?, ?/*, ?*/)")) {
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+
+        try (Connection connection = DriverManager.getConnection(connectionString);
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO accounts(username, password, balance, iban) VALUES (?, ?, ?, ?)")) {
 
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, password);
             preparedStatement.setBigDecimal(3, balance);
             preparedStatement.setString(4, iban);
-            //preparedStatement.setString(4, iban);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -130,18 +227,6 @@ public class CreateDB {
 
         } catch (SQLException e) {
             System.err.println("Error: " + e.getMessage());
-        }
-    }
-    public static void closeResources(Connection connection, Statement statement) {
-        try {
-            if (statement != null) {
-                statement.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 }

@@ -5,10 +5,10 @@ import java.sql.*;
 public class SqlServerExample {
     public static void main(String[] args) {
 
-        String SERVER_NAME = "DESKTOP-HL1EFJ9"; // Replace with your server name
+        String SERVER_NAME = "192.168.1.70"; //"DESKTOP-HL1EFJ9"; // Replace with your server name
         String DATABASE_NAME = "BankOfCanedo"; // Replace with your database name
         String UID = "boc"; // Replace with your username
-        String PWD = "1234"; // Replace with your password
+        String PWD = "VeryStr0ngP@ssw0rd";//"1234"; // Replace with your password
 
         /*String connectionString =
                 "jdbc:sqlserver://DESKTOP-HL1EFJ9:1433;database=BankOfCanedo;integratedSecurity=true";*/
