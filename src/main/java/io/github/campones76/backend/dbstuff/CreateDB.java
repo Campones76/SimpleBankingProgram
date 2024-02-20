@@ -71,10 +71,10 @@ public class CreateDB {
             if (tableCount == 0) {
                 // Table doesn't exist, so create it
                 String createTableSQL = "CREATE TABLE accounts (\n"
-                        + "id INT PRIMARY KEY IDENTITY(1,1),\n"  // Using IDENTITY for auto-increment in SQL Server
-                        + "username NVARCHAR(255) NOT NULL,\n"  // NVARCHAR for variable-length Unicode strings
+                        + "id INT PRIMARY KEY IDENTITY(1,1),\n"  // IDENTITY for auto-increment in SQL Server
+                        + "username NVARCHAR(255) NOT NULL,\n"  // NVARCHAR for variable-length strings
                         + "password NVARCHAR(255) NOT NULL,\n"
-                        + "balance DECIMAL(10, 2),\n"  // DECIMAL for exact numeric data types
+                        + "balance DECIMAL(10, 2),\n"  // DECIMAL for exact numeric data types absolutely needed when handling money
                         + "iban NVARCHAR(50) NOT NULL\n"
                         + ")";
                 statement.execute(createTableSQL);
