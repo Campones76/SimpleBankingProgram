@@ -1,7 +1,7 @@
 # TODO
 
 ## Section
-- [ ] Add connection pooling
+- [-] Add connection pooling
 - [ ] Send money to other accounts
   - [ ] Make the transaction take 10 seconds if at least one of the parties does not have a Canedo Bank Identifier in their IBAN
 
