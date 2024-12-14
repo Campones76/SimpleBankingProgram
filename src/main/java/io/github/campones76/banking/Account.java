@@ -41,6 +41,7 @@ public class Account {
         this.hashedPassword = hashedPassword;
         this.balance = initialBalance;
         this.iban = generateUniqueIban();
+
         //liban = generatePortugueseIban();
         //this.iban = generatePortugueseIban();
     }

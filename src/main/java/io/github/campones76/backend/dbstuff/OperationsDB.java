@@ -27,8 +27,10 @@ public class OperationsDB {
             if (resultSet.next()) {
                 String passwd = resultSet.getString("password");
                 BigDecimal balance = resultSet.getBigDecimal("balance");
+                String iban = resultSet.getString("iban");
                 Account account = new Account();
                 account.createAccount(username, passwd, balance); // Use the password from the database
+                account.setIban(iban);
                 return account;
             }
         } catch (SQLException e) {
@@ -104,7 +106,7 @@ public class OperationsDB {
     }
 
     public static void updateBalanceInDatabase(String username, BigDecimal newBalance) {
-        String SERVER_NAME = "192.168.1.70";
+        String SERVER_NAME = "192.168.1.70"; //192.168.1.7f0
         String DATABASE_NAME = "BankOfCanedo";
         String UID = "boc";
         String PWD = "VeryStr0ngP@ssw0rd";
@@ -182,4 +184,37 @@ public class OperationsDB {
             e.printStackTrace();
         }
     }
+
+    public static String getIbanFromDatabase(String username) {
+        String SERVER_NAME = "192.168.1.70";
+        String DATABASE_NAME = "BankOfCanedo";
+        String UID = "boc";
+        String PWD = "VeryStr0ngP@ssw0rd";
+
+        String connectionString = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;trustServerCertificate=true",
+                SERVER_NAME, DATABASE_NAME, UID, PWD);
+        String iban = null;
+        String query = "SELECT username FROM accounts WHERE iban = ?";
+
+        try (Connection conn = DriverManager.getConnection(connectionString);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            // Define o parâmetro da consulta
+            pstmt.setString(1, username);
+
+            // Executa a consulta
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    // Obtém o IBAN da coluna "iban"
+                    iban = rs.getString("iban");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Opcional: Pode-se lançar uma exceção personalizada ou registrar o erro
+        }
+
+        return iban; // Retorna o IBAN ou null caso não exista
+    }
+
 }
